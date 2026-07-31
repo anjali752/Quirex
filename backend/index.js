@@ -7,6 +7,7 @@ import cors from "cors";
 
 const app = express();
 
+// Middleware
 app.use(express.json());
 
 app.use(
@@ -18,7 +19,7 @@ app.use(
 
 app.use(fileUpload());
 
-// Database connect
+// Database connection
 dbConnect();
 
 // Static folder
@@ -33,9 +34,13 @@ app.get("/", (req, res) => {
     res.send("QuireX backend is running.");
 });
 
-// Port
-const PORT = process.env.PORT || 9000;
-
-app.listen(PORT, () => {
-    console.log(`Server running on port ${PORT}`);
+// Test route
+app.get("/test", (req, res) => {
+    res.json({
+        success: true,
+        message: "Backend is working successfully.",
+    });
 });
+
+// Vercel ke liye export
+export default app;
