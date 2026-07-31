@@ -20,28 +20,49 @@ const Login = () => {
   const { register, handleSubmit, formState: { errors } } = useForm({
     resolver: yupResolver(schema),
   });
-  const handleLogin = async (data) => {
-    const response = await axios.post('http://localhost:9000/api/login', data)
-    if (response?.data?.code == 200) {
+ const handleLogin = async (data) => {
+  try {
+    const API_URL = import.meta.env.VITE_API_URL;
+
+    const response = await axios.post(
+      `${API_URL}/api/login`,
+      data
+    );
+
+    if (response?.data?.code === 200) {
       Swal.fire({
         title: "Login",
         text: response?.data?.message,
-        icon: "success"
+        icon: "success",
       });
-      localStorage.setItem('userInfo', JSON.stringify(response?.data?.data));
-      if (response?.data?.data?.userType == "admin") {
-        navigate('/admin-add')
-      } else if (response?.data?.data?.userType == "user") {
-        navigate('/user-property')
+
+      localStorage.setItem(
+        "userInfo",
+        JSON.stringify(response?.data?.data)
+      );
+
+      if (response?.data?.data?.userType === "admin") {
+        navigate("/admin-add");
+      } else if (response?.data?.data?.userType === "user") {
+        navigate("/user-property");
       }
     } else {
       Swal.fire({
         title: "Login",
         text: response?.data?.message,
-        icon: "error"
+        icon: "error",
       });
     }
+  } catch (error) {
+    Swal.fire({
+      title: "Error",
+      text: error?.response?.data?.message || "Login failed.",
+      icon: "error",
+    });
+
+    console.log(error);
   }
+};
   return (
     <>
       <Navbar/>
