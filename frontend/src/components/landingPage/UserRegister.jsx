@@ -27,38 +27,43 @@ const UserRegister = () => {
    const { register, handleSubmit, formState: { errors } } = useForm({
     resolver: yupResolver(schema),
    }) 
-   const handleRegister=async(data)=>{
-
-     try {
+   const handleRegister = async (data) => {
+  try {
     const formData = new FormData();
 
-    formData.append('name', data.name);
-    formData.append('email', data.email);
-    formData.append('contact', data.contact);
-    formData.append('password', data.password);
-    formData.append('address', data.address);
-    formData.append('profile', data.profile[0]); 
+    formData.append("name", data.name);
+    formData.append("email", data.email);
+    formData.append("phone", data.phone);
+    formData.append("password", data.password);
+    formData.append("address", data.address);
+    formData.append("profile", data.profile[0]);
 
-    const response = await axios.post('http://localhost:9000/api/user-register', formData, {
-      headers: {
-        'Content-Type': 'multipart/form-data',
-      },
-    });
-if (response.status === 200) {
+    const API_URL = import.meta.env.VITE_API_URL;
+
+    const response = await axios.post(
+      `${API_URL}/api/user-register`,
+      formData,
+      {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      }
+    );
+
+    if (response.status === 200) {
       Swal.fire({
         title: "Registration Successful",
         text: response?.data?.message,
-        icon: "success"
+        icon: "success",
       });
-     
     }
   } catch (error) {
-    console.error('Registration error:', error);
-    Swal.fire({
-       title: "Registration Failed",
-        text: response?.data?.message,
-        icon: "error"
+    console.error("Registration error:", error);
 
+    Swal.fire({
+      title: "Registration Failed",
+      text: error?.response?.data?.message || "Something went wrong.",
+      icon: "error",
     });
   }
 };
