@@ -3,42 +3,45 @@ import { userModel, propertyModel, buyerModel ,ContactModel} from '../model/tabl
 const router = express.Router();
 router.post('/user-register', async (req, res) => {
   try {
-    const { name, email, password, contact, address } = req.body;
-    const { profile } = req.files;
-    profile.mv("uploads/" + profile?.name, (err) => {
-      if (err) {
-        res.json({
-          code: 400,
-          message: "Error in File Upload.",
-          data: ''
-        })
-      }
+    const { name, email, password, contact, phone, address } = req.body;
+    const userContact = contact || phone;
+    let profileName = "";
+
+    if (req.files && req.files.profile) {
+      const profile = req.files.profile;
+      profileName = profile.name;
+      profile.mv("uploads/" + profileName, (err) => {
+        if (err) {
+          console.error("Upload error:", err);
+        }
+      });
     }
-    )
+
     const isExist = await userModel.findOne({ email });
     if (isExist) {
-      res.json({
+      return res.json({
         code: 400,
-        message: "User already exist.",
+        message: "User already exists.",
         data: isExist
-      })
+      });
     } else {
-      const data = new userModel({ name, email, password, contact, address, profile: profile?.name });
+      const data = new userModel({ name, email, password, contact: userContact, address, profile: profileName });
       const result = await data.save();
-      res.json({
+      return res.json({
         code: 200,
-        message: "User Register  Successfully...",
+        message: "User Registered Successfully...",
         data: result
-      })
+      });
     }
   } catch (err) {
-    res.json({
+    console.error("Register Error:", err);
+    return res.json({
       code: 500,
       message: "Internal Server Error",
       data: ''
-    })
+    });
   }
-})
+});
 
 router.post('/login', async (req, res) => {
   try {

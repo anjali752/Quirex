@@ -14,15 +14,14 @@ import Swal from 'sweetalert2';
 const schema = yup
   .object()
   .shape({
-    name:yup.string().required(),
-    email: yup.string().required().email(),
-    phone:yup.string().required(),
-    password: yup.string().required().min(5).max(20),
-    address: yup.string().required(),
-     profile:yup.mixed().required(),
-    //  .test("fileType","unsupported file formate",(value)=>value? value.size<=2*1024*1024:false)
-    //  .test("fileType","unsupported file format",(value)=>value?["application/pdf","image/jpeg","image/jpg","image/png"].includes(value.type):false),
-  })
+    name: yup.string().required("Name is required"),
+    email: yup.string().required("Email is required").email("Invalid email"),
+    phone: yup.string().required("Phone number is required"),
+    password: yup.string().required("Password is required").min(5, "Min 5 characters"),
+    address: yup.string().required("Address is required"),
+    profile: yup.mixed(),
+  });
+
 const UserRegister = () => {
    const { register, handleSubmit, formState: { errors } } = useForm({
     resolver: yupResolver(schema),
@@ -34,11 +33,14 @@ const UserRegister = () => {
     formData.append("name", data.name);
     formData.append("email", data.email);
     formData.append("phone", data.phone);
+    formData.append("contact", data.phone);
     formData.append("password", data.password);
     formData.append("address", data.address);
-    formData.append("profile", data.profile[0]);
+    if (data.profile && data.profile[0]) {
+      formData.append("profile", data.profile[0]);
+    }
 
-    const API_URL = import.meta.env.VITE_API_URL;
+    const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:4000';
 
     const response = await axios.post(
       `${API_URL}/api/user-register`,
@@ -50,11 +52,17 @@ const UserRegister = () => {
       }
     );
 
-    if (response.status === 200) {
+    if (response?.data?.code === 200 || response?.status === 200) {
       Swal.fire({
         title: "Registration Successful",
-        text: response?.data?.message,
+        text: response?.data?.message || "Registered successfully!",
         icon: "success",
+      });
+    } else {
+      Swal.fire({
+        title: "Registration Failed",
+        text: response?.data?.message || "Registration failed.",
+        icon: "error",
       });
     }
   } catch (error) {
@@ -62,7 +70,7 @@ const UserRegister = () => {
 
     Swal.fire({
       title: "Registration Failed",
-      text: error?.response?.data?.message || "Something went wrong.",
+      text: error?.response?.data?.message || error.message || "Something went wrong.",
       icon: "error",
     });
   }
@@ -70,7 +78,6 @@ const UserRegister = () => {
 
   return (
     <> 
-      <Navbar/>
       <div className="container my-5">
         <h2 className="text-center">Register Here</h2>
         <div className="row justify-content-center">

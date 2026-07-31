@@ -22,7 +22,7 @@ const Login = () => {
   });
  const handleLogin = async (data) => {
   try {
-    const API_URL = import.meta.env.VITE_API_URL;
+    const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:4000';
 
     const response = await axios.post(
       `${API_URL}/api/login`,
@@ -49,14 +49,14 @@ const Login = () => {
     } else {
       Swal.fire({
         title: "Login",
-        text: response?.data?.message,
+        text: response?.data?.message || "Invalid Credentials",
         icon: "error",
       });
     }
   } catch (error) {
     Swal.fire({
       title: "Error",
-      text: error?.response?.data?.message || "Login failed.",
+      text: error?.response?.data?.message || error.message || "Login failed.",
       icon: "error",
     });
 
@@ -65,7 +65,6 @@ const Login = () => {
 };
   return (
     <>
-      <Navbar/>
       <div className="container my-5">
         <h2 className="login-title">Login Here</h2>
         <div className="login-box">

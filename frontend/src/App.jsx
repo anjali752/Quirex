@@ -48,10 +48,8 @@ function App() {
 
   return (
     <>
-     
-        <TopNavbar />
-        {/* <Navbar /> */}
-        <Routes>
+      <TopNavbar />
+      <Routes>
           {/* landing page router */}
           <Route path='/' element={<Home />} />
           <Route path='/about' element={<About />} />
